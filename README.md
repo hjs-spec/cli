@@ -251,6 +251,6 @@ MIT © [HJS Ltd.](https://humanjudgment.org)
 
 ---
 
-**© 2026 HJS Ltd.**  
+**© 2026 HJS Foundation Ltd.**  
 This document is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 ```
