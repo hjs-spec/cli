@@ -247,10 +247,10 @@ Please see our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_
 
 ## License
 
-MIT © [Human Judgment Systems Foundation Ltd.](https://humanjudgment.org)
+MIT © [HJS Ltd.](https://humanjudgment.org)
 
 ---
 
-**© 2026 Human Judgment Systems Foundation Ltd.**  
+**© 2026 HJS Ltd.**  
 This document is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 ```
