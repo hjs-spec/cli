@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// HJS CLI 工具
+// JEP CLI 工具
 // 命令行管理 HJS API
 
 const { Command } = require('commander');
@@ -10,10 +10,10 @@ const path = require('path');
 const os = require('os');
 
 const program = new Command();
-const HJS_API_BASE = process.env.HJS_API_URL || 'https://api.hjs.sh';
+const JEP_API_BASE = process.env.JEP_API_URL || 'https://api.jep.sh';
 
 // 配置文件路径
-const CONFIG_PATH = path.join(os.homedir(), '.hjs', 'config.json');
+const CONFIG_PATH = path.join(os.homedir(), '.jep', 'config.json');
 
 // 读取配置
 async function readConfig() {
@@ -59,14 +59,14 @@ async function hjsRequest(endpoint, options = {}) {
 }
 
 program
-    .name('hjs')
-    .description('HJS Protocol CLI')
+    .name('jep')
+    .description('JEP Protocol CLI')
     .version('1.0.0');
 
 // 登录命令
 program
     .command('login')
-    .description('Authenticate with HJS API')
+    .description('Authenticate with JEP API')
     .option('-k, --key <apiKey>', 'API Key')
     .action(async (options) => {
         try {
@@ -84,7 +84,7 @@ program
             
             // 验证 key
             await saveConfig({ apiKey });
-            const account = await hjsRequest('/v1/account');
+            const account = await jepRequest('/v1/account');
             
             console.log(chalk.green('✓'), `Logged in as ${account.account.name}`);
             console.log(chalk.gray('  Environment:'), account.account.environment);
@@ -101,7 +101,7 @@ program
     .description('Show account information')
     .action(async () => {
         try {
-            const account = await hjsRequest('/v1/account');
+            const account = await jepRequest('/v1/account');
             
             console.log(chalk.bold('Account Information'));
             console.log(chalk.gray('─'.repeat(40)));
@@ -127,7 +127,7 @@ program
         try {
             const scope = JSON.parse(options.scope);
             
-            const result = await hjsRequest('/v1/judgments', {
+            const result = await jepRequest('/v1/judgments', {
                 method: 'POST',
                 body: JSON.stringify({
                     entity: options.entity,
@@ -158,7 +158,7 @@ program
     .option('-f, --format <format>', 'Output format (json, table)', 'table')
     .action(async (id, options) => {
         try {
-            const result = await hjsRequest(`/v1/judgments/${id}`);
+            const result = await jepRequest(`/v1/judgments/${id}`);
             
             if (options.format === 'json') {
                 console.log(JSON.stringify(result, null, 2));
@@ -189,7 +189,7 @@ program
     .option('--json', 'Output as JSON')
     .action(async (options) => {
         try {
-            const result = await hjsRequest(`/v1/judgments?limit=${options.limit}`);
+            const result = await jepRequest(`/v1/judgments?limit=${options.limit}`);
             
             if (options.json) {
                 console.log(JSON.stringify(result, null, 2));
@@ -215,7 +215,7 @@ program
     .description('Verify a record')
     .action(async (id) => {
         try {
-            const result = await hjsRequest('/v1/verify', {
+            const result = await jepRequest('/v1/verify', {
                 method: 'POST',
                 body: JSON.stringify({ id })
             });
@@ -240,7 +240,7 @@ sandboxCmd
     .description('Show sandbox status')
     .action(async () => {
         try {
-            const status = await hjsRequest('/sandbox/status');
+            const status = await jepRequest('/sandbox/status');
             
             console.log(chalk.bold('Sandbox Status'));
             console.log(chalk.gray('─'.repeat(40)));
@@ -270,7 +270,7 @@ sandboxCmd
                 return;
             }
             
-            await hjsRequest('/sandbox/reset', { method: 'POST' });
+            await jepRequest('/sandbox/reset', { method: 'POST' });
             console.log(chalk.green('✓'), 'Sandbox reset complete');
             
         } catch (err) {
@@ -288,7 +288,7 @@ program
         console.log(chalk.bold('Configuration'));
         console.log(chalk.gray('─'.repeat(40)));
         console.log('Config file:', CONFIG_PATH);
-        console.log('API URL:    ', HJS_API_BASE);
+        console.log('API URL:    ', JEP_API_BASE);
         console.log('API Key:    ', config.apiKey ? '***' + config.apiKey.slice(-4) : 'Not set');
     });
 
