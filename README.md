@@ -21,7 +21,7 @@ Command-line interface for [JEP: A Judgment Event Protocol](https://github.com/h
 
 ## Overview
 
-HJS CLI is a command-line tool for interacting with the JEP protocol. It allows you to:
+JEP CLI is a command-line tool for interacting with the JEP protocol. It allows you to:
 
 - Create and manage judgment records
 - Delegate authority to other entities
