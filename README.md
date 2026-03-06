@@ -1,19 +1,19 @@
-# HJS CLI
+# JEP CLI
 
-Command-line interface for [HJS: A Judgment Event Protocol](https://github.com/hjs-protocol/spec).
+Command-line interface for [JEP: A Judgment Event Protocol](https://github.com/hjs-protocol/spec).
 
 <p align="center">
-    <a href="https://github.com/hjs-protocol/cli">
+    <a href="https://github.com/jep-protocol/cli">
         <img src="https://img.shields.io/badge/Status-CLI%20Tool%20%7C%20v1.0.0-blue" alt="Status">
     </a>
     <a href="https://opensource.org/licenses/MIT">
         <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
     </a>
-    <a href="https://github.com/hjs-protocol/cli/issues">
+    <a href="https://github.com/jep-protocol/cli/issues">
         <img src="https://img.shields.io/badge/Issues-Welcome-brightgreen" alt="Issues">
     </a>
     <a href="https://www.npmjs.com/package/@hjs/cli">
-        <img src="https://img.shields.io/npm/v/@hjs/cli" alt="npm version">
+        <img src="https://img.shields.io/npm/v/@jep/cli" alt="npm version">
     </a>
 </p>
 
@@ -21,7 +21,7 @@ Command-line interface for [HJS: A Judgment Event Protocol](https://github.com/h
 
 ## Overview
 
-HJS CLI is a command-line tool for interacting with the HJS protocol. It allows you to:
+HJS CLI is a command-line tool for interacting with the JEP protocol. It allows you to:
 
 - Create and manage judgment records
 - Delegate authority to other entities
@@ -34,13 +34,13 @@ HJS CLI is a command-line tool for interacting with the HJS protocol. It allows 
 ### Via npm (recommended)
 
 ```bash
-npm install -g @hjs/cli
+npm install -g @jep/cli
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/hjs-protocol/cli.git
+git clone https://github.com/jep-protocol/cli.git
 cd cli
 npm install
 npm link
@@ -57,13 +57,13 @@ hjs config set api-key YOUR_API_KEY
 If you're using a self-hosted HJS API instance, you can also set the API URL:
 
 ```bash
-hjs config set api-url https://your-hjs-instance.com
+jep config set api-url https://your-jep-instance.com
 ```
 
 ### 2. Create a judgment record
 
 ```bash
-hjs judgment create \
+jep judgment create \
   --entity user@example.com \
   --action approve \
   --scope '{"amount": 1000, "currency": "USD"}'
@@ -72,18 +72,18 @@ hjs judgment create \
 ### 3. Query a record
 
 ```bash
-hjs judgment get jgd_1234567890abcd
+jep judgment get jgd_1234567890abcd
 ```
 
 ### 4. Verify a record
 
 ```bash
-hjs verify jgd_1234567890abcd
+jep verify jgd_1234567890abcd
 ```
 
 ## Commands
 
-### `hjs judgment`
+### `jep judgment`
 
 Manage judgment records.
 
@@ -103,7 +103,7 @@ Manage judgment records.
 - `--immutability, -i` - Anchor type (ots, none)
 - `--format, -f` - Output format (json, text)
 
-### `hjs delegation`
+### `jep delegation`
 
 Manage delegations.
 
@@ -114,7 +114,7 @@ Manage delegations.
 | `list` | List delegations |
 | `revoke <id>` | Revoke a delegation |
 
-### `hjs termination`
+### `jep termination`
 
 Manage terminations.
 
@@ -124,7 +124,7 @@ Manage terminations.
 | `get <id>` | Retrieve a termination by ID |
 | `list` | List terminations |
 
-### `hjs verify`
+### `jep verify`
 
 Verify records and receipts.
 
@@ -133,7 +133,7 @@ Verify records and receipts.
 | `<id>` | Verify a record by ID |
 | `receipt <file>` | Verify a receipt file |
 
-### `hjs config`
+### `jep config`
 
 Manage CLI configuration.
 
@@ -144,14 +144,14 @@ Manage CLI configuration.
 | `list` | List all configuration |
 | `clear` | Clear configuration |
 
-Configuration is stored in `~/.hjs/config.json`.
+Configuration is stored in `~/.jep/config.json`.
 
 ## Examples
 
 ### Create a judgment with scope
 
 ```bash
-hjs judgment create \
+jep judgment create \
   --entity loan-officer-123 \
   --action approve_loan \
   --scope '{"amount": 50000, "risk_score": 0.12, "customer_id": "cust_789"}'
@@ -161,10 +161,10 @@ hjs judgment create \
 
 ```bash
 # Create a judgment first
-JUDGMENT_ID=$(hjs judgment create --entity manager@company.com --action "delegate_access" --quiet)
+JUDGMENT_ID=$(jep judgment create --entity manager@company.com --action "delegate_access" --quiet)
 
 # Delegate to an employee
-hjs delegation create \
+jep delegation create \
   --delegator manager@company.com \
   --delegatee employee@company.com \
   --judgment-id $JUDGMENT_ID \
@@ -176,10 +176,10 @@ hjs delegation create \
 
 ```bash
 # Download receipt
-hjs judgment get jgd_1234567890abcd --format receipt > record.ots
+jep judgment get jgd_1234567890abcd --format receipt > record.ots
 
 # Verify offline
-hjs verify receipt record.ots
+jep verify receipt record.ots
 ```
 
 ## Configuration
@@ -188,21 +188,21 @@ The CLI can be configured via:
 
 1. **Command-line arguments** (highest priority)
 2. **Environment variables**
-3. **Config file** (`~/.hjs/config.json`)
+3. **Config file** (`~/.jep/config.json`)
 
 ### Environment variables
 
 | Variable | Description |
 |----------|-------------|
-| `HJS_API_URL` | API endpoint (default: https://api.hjs.sh) |
-| `HJS_API_KEY` | API key for authentication |
-| `HJS_OUTPUT` | Default output format (json, text) |
+| `JEP_API_URL` | API endpoint (default: https://api.jep.sh) |
+| `JEP_API_KEY` | API key for authentication |
+| `JEP_OUTPUT` | Default output format (json, text) |
 
 ### Config file example
 
 ```json
 {
-  "apiUrl": "https://api.hjs.sh",
+  "apiUrl": "https://api.jep.sh",
   "apiKey": "your-api-key-here",
   "output": "text",
   "defaults": {
@@ -216,7 +216,7 @@ The CLI can be configured via:
 ### Setup
 
 ```bash
-git clone https://github.com/hjs-protocol/cli.git
+git clone https://github.com/jep-protocol/cli.git
 cd cli
 npm install
 ```
