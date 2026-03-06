@@ -1,23 +1,23 @@
 {
-  "name": "@hjs/cli",
+  "name": "@jep/cli",
   "version": "1.0.0",
-  "description": "HJS Protocol Command Line Interface",
-  "main": "hjs.js",
+  "description": "JEP Protocol Command Line Interface",
+  "main": "jep.js",
   "bin": {
-    "hjs": "./hjs.js"
+    "hjs": "./jep.js"
   },
   "scripts": {
-    "test": "echo \"Run: hjs --help\""
+    "test": "echo \"Run: jep --help\""
   },
   "keywords": [
-    "hjs",
+    "jep",
     "cli",
     "judgment",
     "protocol",
     "traceability",
     "accountability"
   ],
-  "author": "Human Judgment Systems Foundation Ltd.",
+  "author": "HJS Foundation Ltd.",
   "license": "MIT",
   "dependencies": {
     "commander": "^11.0.0",
