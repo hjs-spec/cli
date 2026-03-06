@@ -34,7 +34,7 @@ async function saveConfig(config) {
 // API 请求封装
 async function hjsRequest(endpoint, options = {}) {
     const config = await readConfig();
-    const url = `${HJS_API_BASE}${endpoint}`;
+    const url = `${JEP_API_BASE}${endpoint}`;
     
     const headers = {
         'Content-Type': 'application/json',
