@@ -62,7 +62,7 @@ def cmd_create(args: argparse.Namespace) -> int:
     if args.aud:
         payload["aud"] = args.aud
     if args.ref:
-        payload["ref"] = args.ref
+        payload["ref"] = parse_json_value(args.ref)
     if args.ttl_minutes is not None:
         payload["ttl_minutes"] = args.ttl_minutes
     if args.digest_only_who:
@@ -86,9 +86,13 @@ def cmd_verify(args: argparse.Namespace) -> int:
         "mode": args.mode,
         "consume_nonce": args.consume_nonce,
     }
+    if args.expected_audience:
+        payload["expected_audience"] = args.expected_audience
+    if args.mode == "acceptance" and not args.expected_audience:
+        raise ValueError("acceptance mode requires --expected-audience")
     result = build_client(args).verify_event(payload)
     print_json(result)
-    return 0
+    return 0 if result.get("valid") is True else 2
 
 
 def cmd_health(args: argparse.Namespace) -> int:
@@ -130,7 +134,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     verify = sub.add_parser("verify", help="Verify a JEP event")
     verify.add_argument("event", help="Event JSON object, event JSON file path, or '-' for stdin")
-    verify.add_argument("--mode", default="archival", help="Validation mode")
+    verify.add_argument("--mode", default="archival", choices=["archival", "acceptance"], help="Validation mode")
+    verify.add_argument("--expected-audience", default="", help="Required receiving audience for acceptance")
     verify.add_argument("--consume-nonce", action="store_true", help="Ask verifier to consume nonce")
     verify.set_defaults(func=cmd_verify)
 
