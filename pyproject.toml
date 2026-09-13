@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jep-cli"
-version = "0.6.0"
+version = "0.6.1"
 description = "Command-line tool for creating and verifying JEP v0.6 events through the JEP API"
 readme = "README.md"
 license = { text = "MIT" }
@@ -29,9 +29,9 @@ dev = [
 jep = "jep_cli.main:main"
 
 [project.urls]
-Homepage = "https://github.com/hjs-spec/jep-cli"
-Repository = "https://github.com/hjs-spec/jep-cli"
-Issues = "https://github.com/hjs-spec/jep-cli/issues"
+Homepage = "https://github.com/hjs-spec/cli"
+Repository = "https://github.com/hjs-spec/cli"
+Issues = "https://github.com/hjs-spec/cli/issues"
 
 [tool.setuptools.packages.find]
 include = ["jep_cli*"]
