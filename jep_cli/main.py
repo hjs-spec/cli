@@ -1,4 +1,4 @@
-"""JEP CLI v0.6 command line interface."""
+"""JEP Core 0.7 command line interface."""
 
 from __future__ import annotations
 
@@ -84,13 +84,21 @@ def cmd_verify(args: argparse.Namespace) -> int:
     payload = {
         "event": event,
         "mode": args.mode,
-        "consume_nonce": args.consume_nonce,
     }
+    if args.max_age_seconds is not None:
+        payload["max_age_seconds"] = args.max_age_seconds
     if args.expected_audience:
         payload["expected_audience"] = args.expected_audience
-    if args.mode == "acceptance" and not args.expected_audience:
-        raise ValueError("acceptance mode requires --expected-audience")
     result = build_client(args).verify_event(payload)
+    print_json(result)
+    return 0 if result.get("status") == "valid" else 2
+
+
+def cmd_verify_legacy(args: argparse.Namespace) -> int:
+    event = parse_json_value(args.event)
+    if not isinstance(event, dict):
+        raise ValueError("event must be JSON object or path to JSON event file")
+    result = build_client(args).verify_event_legacy({"event": event, "mode": args.mode})
     print_json(result)
     return 0 if result.get("valid") is True else 2
 
@@ -112,7 +120,7 @@ def cmd_extract_event(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="jep",
-        description="JEP CLI v0.6 for creating and verifying JEP-Core events through the JEP API.",
+        description="JEP CLI for JEP Core 0.7. Legacy pre-0.7 verification is explicit.",
     )
     parser.add_argument("--base-url", default="", help="JEP API base URL. Default: JEP_API_URL or http://127.0.0.1:8000")
     parser.add_argument("--api-key", default="", help="API key. Default: JEP_API_KEY")
@@ -125,7 +133,7 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--who", default="", help="Actor identifier")
     create.add_argument("--what", required=True, help="JSON value, string, file path, or '-' for stdin")
     create.add_argument("--aud", default="", help="Audience / validation context")
-    create.add_argument("--ref", default="", help="Reference event hash")
+    create.add_argument("--ref", default="", help="Typed reference JSON, digest, or file path")
     create.add_argument("--ttl-minutes", type=int, default=None, help="Optional TTL extension in minutes")
     create.add_argument("--digest-only-who", action="store_true", help="Request digest-only privacy extension")
     create.add_argument("--ext", action="append", default=[], help="Extension key=json_or_string. May be repeated")
@@ -135,9 +143,14 @@ def build_parser() -> argparse.ArgumentParser:
     verify = sub.add_parser("verify", help="Verify a JEP event")
     verify.add_argument("event", help="Event JSON object, event JSON file path, or '-' for stdin")
     verify.add_argument("--mode", default="archival", choices=["archival", "acceptance"], help="Validation mode")
-    verify.add_argument("--expected-audience", default="", help="Required receiving audience for acceptance")
-    verify.add_argument("--consume-nonce", action="store_true", help="Ask verifier to consume nonce")
+    verify.add_argument("--expected-audience", default="", help="Expected audience when the selected profile requires it")
+    verify.add_argument("--max-age-seconds", type=int, default=None, help="Optional profile freshness window")
     verify.set_defaults(func=cmd_verify)
+
+    legacy = sub.add_parser("verify-legacy", help="Explicitly verify a historical pre-0.7 event")
+    legacy.add_argument("event", help="Historical event JSON object, file path, or '-' for stdin")
+    legacy.add_argument("--mode", default="archival", choices=["archival", "acceptance"])
+    legacy.set_defaults(func=cmd_verify_legacy)
 
     health = sub.add_parser("health", help="Check JEP API health")
     health.set_defaults(func=cmd_health)
