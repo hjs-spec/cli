@@ -1,4 +1,4 @@
-"""Small HTTP client for JEP CLI v0.6."""
+"""Small HTTP client for the JEP Core 0.7 CLI."""
 
 from __future__ import annotations
 
@@ -26,10 +26,16 @@ class JEPClient:
         self.timeout = timeout
 
     def create_event(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        return self._json("POST", "/events/create", payload)
+        return self._json("POST", "/v0.7/events/create", payload)
 
     def verify_event(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        return self._json("POST", "/events/verify", payload)
+        return self._json("POST", "/v0.7/events/verify", payload)
+
+    def create_event_legacy(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        return self._json("POST", "/events/create", payload)
+
+    def verify_event_legacy(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        return self._json("POST", "/events/verify-legacy", payload)
 
     def health(self) -> Dict[str, Any]:
         return self._json("GET", "/health", None)
@@ -38,7 +44,7 @@ class JEPClient:
         data = None
         headers = {
             "content-type": "application/json",
-            "user-agent": "JEP-CLI/0.6.0",
+            "user-agent": "JEP-CLI/0.7.0",
         }
         if self.api_key:
             headers["authorization"] = f"Bearer {self.api_key}"
@@ -57,5 +63,5 @@ class JEPClient:
                 parsed = json.loads(body)
             except Exception:
                 parsed = {"message": body}
-            msg = parsed.get("message") or parsed.get("error") or body
+            msg = parsed.get("message") or parsed.get("detail") or parsed.get("error") or body
             raise JEPAPIError(exc.code, msg, parsed) from exc
