@@ -1,4 +1,4 @@
-"""Tests for JEP CLI v0.6."""
+"""Tests for JEP CLI against JEP Core 0.7."""
 
 import json
 import threading
@@ -20,51 +20,55 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            self._json(200, {"ok": True, "profile": "jep-core-0.6"})
+            self._json(200, {"ok": True, "profile": "jep-core-0.7"})
         else:
             self._json(404, {"message": "not found"})
 
     def do_POST(self):
         length = int(self.headers.get("content-length", "0"))
         payload = json.loads(self.rfile.read(length) or b"{}")
-        if self.path == "/events/create":
+        if self.path == "/v0.7/events/create":
             event = {
                 "jep": "1",
+                "id": payload.get("id", "urn:uuid:00000000-0000-7000-8000-000000000001"),
                 "verb": payload["verb"],
                 "who": payload.get("who", "did:example:agent"),
                 "when": 1234567890,
-                "what": payload.get("what"),
-                "nonce": "nonce-1",
-                "aud": payload.get("aud"),
-                "ref": payload.get("ref"),
-                "ext": payload.get("ext"),
-                "ext_crit": payload.get("ext_crit"),
+                "what": payload["what"],
                 "sig": "header..sig",
             }
+            for key in ("aud", "ref", "ext", "ext_crit"):
+                if payload.get(key) is not None:
+                    event[key] = payload[key]
             self._json(200, {
                 "event": event,
                 "event_hash": "sha256:abc",
                 "validation": {
-                    "valid": True,
-                    "level": 1,
+                    "status": "valid",
                     "mode": "archival",
-                    "profile": "jep-core-0.6",
+                    "profile": "jep-core-0.7",
+                    "event_identity": {"who": event["who"], "id": event["id"]},
+                    "checks": {"syntax": "pass", "cryptographic": "pass", "event_identity": "pass"},
                     "event_hash": "sha256:abc",
                     "warnings": [],
                     "errors": [],
                 }
             })
             return
-        if self.path == "/events/verify":
+        if self.path == "/v0.7/events/verify":
             self._json(200, {
-                "valid": True,
-                "level": 1,
+                "status": "valid",
                 "mode": payload.get("mode", "archival"),
-                "profile": "jep-core-0.6",
+                "profile": "jep-core-0.7",
+                "event_identity": {"who": payload["event"]["who"], "id": payload["event"]["id"]},
+                "checks": {"syntax": "pass", "cryptographic": "pass", "event_identity": "pass"},
                 "event_hash": "sha256:def",
                 "warnings": [],
                 "errors": [],
             })
+            return
+        if self.path == "/events/verify-legacy":
+            self._json(200, {"valid": True, "level": 1, "profile": "jep-core-0.6"})
             return
         self._json(404, {"message": "not found"})
 
@@ -100,36 +104,32 @@ def test_parse_ext_items():
 
 def test_health(api_server, capsys):
     code = main(["--base-url", api_server, "health"])
-    out = capsys.readouterr().out
+    out = json.loads(capsys.readouterr().out)
     assert code == 0
-    assert '"ok": true' in out
+    assert out["profile"] == "jep-core-0.7"
 
 
-def test_create(api_server, capsys):
+def test_create_v07(api_server, capsys):
     code = main([
-        "--base-url", api_server,
-        "create",
+        "--base-url", api_server, "create",
         "--verb", "J",
         "--who", "did:example:agent",
         "--what", '{"claim":"approve"}',
-        "--ext", 'https://example.org/profile={"name":"demo"}',
-        "--ext-crit", "https://example.org/profile",
     ])
     out = json.loads(capsys.readouterr().out)
     assert code == 0
-    assert out["event_hash"] == "sha256:abc"
-    assert out["event"]["verb"] == "J"
-    assert out["event"]["ext"]["https://example.org/profile"]["name"] == "demo"
+    assert out["event"]["id"]
+    assert out["validation"]["status"] == "valid"
 
 
-def test_verify(api_server, capsys, tmp_path):
+def test_verify_v07(api_server, capsys, tmp_path):
     event = {
         "jep": "1",
+        "id": "urn:uuid:00000000-0000-7000-8000-000000000001",
         "verb": "J",
         "who": "did:example:agent",
         "when": 123,
-        "what": "sha256:abc",
-        "nonce": "nonce-1",
+        "what": {"claim": "approve"},
         "sig": "header..sig",
     }
     p = tmp_path / "event.json"
@@ -137,12 +137,22 @@ def test_verify(api_server, capsys, tmp_path):
     code = main(["--base-url", api_server, "verify", str(p)])
     out = json.loads(capsys.readouterr().out)
     assert code == 0
-    assert out["valid"] is True
+    assert out["status"] == "valid"
+    assert out["checks"]["event_identity"] == "pass"
+
+
+def test_explicit_legacy_verify(api_server, capsys, tmp_path):
+    p = tmp_path / "legacy.json"
+    p.write_text(json.dumps({"jep": "1", "nonce": "legacy"}))
+    code = main(["--base-url", api_server, "verify-legacy", str(p)])
+    out = json.loads(capsys.readouterr().out)
+    assert code == 0
+    assert out["profile"] == "jep-core-0.6"
 
 
 def test_extract_event(capsys, tmp_path):
     p = tmp_path / "response.json"
-    p.write_text(json.dumps({"event": {"jep": "1", "verb": "J"}}))
+    p.write_text(json.dumps({"event": {"jep": "1", "id": "urn:uuid:x", "verb": "J"}}))
     code = main(["extract-event", str(p)])
     out = json.loads(capsys.readouterr().out)
     assert code == 0
