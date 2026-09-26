@@ -1,9 +1,9 @@
-# Release 0.7.0
+# Release 0.7.1
 
-- Default create and verify commands target JEP Core 0.7 versioned API endpoints.
-- Validation uses `status` and independent checks rather than cumulative levels.
-- Current create path no longer assumes a Core nonce.
-- Historical pre-0.7 verification is available only through explicit `--legacy`
-  decoder selection.
-- Repository links and examples now point to the canonical `hjs-spec/jep-core`.
+Release the current JEP Core 0.7 CLI after repairing the acceptance regression gate.
 
+- Default creation and verification use `/v0.7/events/*`; audience is optional unless a selected profile requires it.
+- Explicit `--legacy` / `--legacy-format` options preserve the historical decoder contract. No fallback after current validation fails.
+- Invalid and indeterminate verification return exit code 2; input or transport errors return 1.
+- Large inline JSON is parsed before filesystem probing.
+- Package, import, user-agent, tag, and built distribution versions are aligned and checked before publication.
