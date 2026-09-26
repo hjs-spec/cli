@@ -44,7 +44,7 @@ class JEPClient:
         data = None
         headers = {
             "content-type": "application/json",
-            "user-agent": "JEP-CLI/0.7.0",
+            "user-agent": "JEP-CLI/0.7.1",
         }
         if self.api_key:
             headers["authorization"] = f"Bearer {self.api_key}"

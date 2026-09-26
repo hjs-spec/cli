@@ -19,14 +19,19 @@ def parse_json_value(value: str) -> Any:
     if value == "-":
         return json.load(sys.stdin)
 
-    path = Path(value)
-    if path.exists() and path.is_file():
-        return json.loads(path.read_text(encoding="utf-8"))
-
     try:
         return json.loads(value)
     except json.JSONDecodeError:
-        return value
+        pass
+    # Inline event JSON may be longer than the filesystem filename limit.
+    path = Path(value)
+    try:
+        is_file = path.is_file()
+    except OSError:
+        is_file = False
+    if is_file:
+        return json.loads(path.read_text(encoding="utf-8"))
+    return value
 
 
 def parse_ext_items(items: list[str]) -> Dict[str, Any]:
@@ -140,7 +145,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify = sub.add_parser("verify", help="Verify a JEP event")
     verify.add_argument("event", help="Event JSON object, event JSON file path, or '-' for stdin")
     verify.add_argument("--mode", default="archival", choices=["archival", "acceptance"], help="Validation mode")
-    verify.add_argument("--expected-audience", default="", help="Required receiving audience for acceptance")
+    verify.add_argument("--expected-audience", default="", help="Optional audience required by the selected acceptance profile")
     verify.add_argument("--max-age-seconds", type=int, default=None, help="Optional profile freshness window")
     verify.add_argument("--legacy", action="store_true", help="Use explicit pre-0.7 legacy verifier")
     verify.add_argument("--legacy-format", default="json-sorted-v1", choices=["json-sorted-v1", "hf-space-v06"], help="Historical decoder format; used only with --legacy")
