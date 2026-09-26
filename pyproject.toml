@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jep-cli"
-version = "0.6.1"
-description = "Command-line tool for creating and verifying JEP v0.6 events through the JEP API"
+version = "0.7.0"
+description = "Command-line tool for creating and verifying JEP Core 0.7 events through the JEP API"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
