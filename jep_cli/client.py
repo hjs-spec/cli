@@ -6,6 +6,8 @@ import json
 from typing import Any, Dict, Optional
 from urllib import request, error
 
+from . import strict_json
+
 
 class JEPCLIError(Exception):
     pass
@@ -44,19 +46,19 @@ class JEPClient:
         data = None
         headers = {
             "content-type": "application/json",
-            "user-agent": "JEP-CLI/0.7.1",
+            "user-agent": "JEP-CLI/0.7.2",
         }
         if self.api_key:
             headers["authorization"] = f"Bearer {self.api_key}"
             headers["x-api-key"] = self.api_key
         if payload is not None:
-            data = json.dumps(payload).encode("utf-8")
+            data = strict_json.dumps(payload).encode("utf-8")
 
         req = request.Request(self.base_url + path, data=data, headers=headers, method=method)
         try:
             with request.urlopen(req, timeout=self.timeout) as resp:
                 body = resp.read().decode("utf-8")
-                return json.loads(body) if body else {}
+                return strict_json.loads(body) if body else {}
         except error.HTTPError as exc:
             body = exc.read().decode("utf-8")
             try:

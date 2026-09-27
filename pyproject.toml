@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jep-cli"
-version = "0.7.1"
+version = "0.7.2"
 description = "Command-line client for JEP Core 0.7 with explicit legacy compatibility"
 readme = "README.md"
 license = { text = "MIT" }
@@ -12,7 +12,7 @@ authors = [
     { name = "HJS Spec", email = "signal@humanjudgment.org" }
 ]
 requires-python = ">=3.9"
-dependencies = []
+dependencies = ["rfc8785==0.1.4"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
