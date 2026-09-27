@@ -16,6 +16,6 @@ python -m pytest -q
 jep --help
 ```
 
-Keep each pull request focused. Test changed behavior and update CLI documentation. The command is `jep`; `jep-agent` and `jep-runtime` belong to separate packages. Protocol requirements stay in [Core](https://github.com/hjs-spec/jep-core).
+Keep each pull request focused. Test changed behavior and update CLI documentation. The command is `jep`; `jep-agent` belongs to the separate local Agent SDK. `jep-runtime` is a retired experiment, retained for historical reproduction. Follow the [repository directory](https://github.com/hjs-spec/.github/blob/main/PROJECTS.md) for maintenance ownership. Protocol requirements stay in [Core](https://github.com/hjs-spec/jep-core).
 
 Contact: signal@humanjudgment.org.
