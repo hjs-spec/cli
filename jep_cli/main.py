@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from .client import JEPClient, JEPCLIError
+from . import strict_json
 
 
 VALID_VERBS = {"J", "D", "T", "V"}
@@ -17,12 +18,16 @@ VALID_VERBS = {"J", "D", "T", "V"}
 
 def parse_json_value(value: str) -> Any:
     if value == "-":
-        return json.load(sys.stdin)
+        # Read bytes when available: a text stream may replace malformed UTF-8.
+        stream = getattr(sys.stdin, "buffer", sys.stdin)
+        return strict_json.loads(stream.read())
 
     try:
-        return json.loads(value)
+        return strict_json.loads(value)
     except json.JSONDecodeError:
-        pass
+        # JSON-looking input must not become a plain string after a parse error.
+        if value.lstrip().startswith(("{", "[", '"')):
+            raise
     # Inline event JSON may be longer than the filesystem filename limit.
     path = Path(value)
     try:
@@ -30,7 +35,8 @@ def parse_json_value(value: str) -> Any:
     except OSError:
         is_file = False
     if is_file:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return strict_json.loads(path.read_bytes())
+    strict_json.validate(value)
     return value
 
 
@@ -40,12 +46,15 @@ def parse_ext_items(items: list[str]) -> Dict[str, Any]:
         if "=" not in item:
             raise ValueError(f"extension must be key=json_or_string, got: {item}")
         key, raw = item.split("=", 1)
+        if key in ext:
+            raise ValueError(f"duplicate extension: {key!r}")
+        strict_json.validate(key)
         ext[key] = parse_json_value(raw)
     return ext
 
 
 def print_json(data: Any) -> None:
-    print(json.dumps(data, indent=2, ensure_ascii=False))
+    print(strict_json.dumps(data))
 
 
 def build_client(args: argparse.Namespace) -> JEPClient:
