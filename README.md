@@ -16,13 +16,14 @@ retries a failed 0.7 event with a legacy decoder.
 
 ## Status
 
-Experimental reference client. It does not define Core semantics or determine
-truth, authorization validity, legal effect, causality, or policy outcome.
+Experimental HTTP client. Event creation and verification run on the configured
+API. Start the [local reference API](https://github.com/hjs-spec/jep-quickstart#start-a-local-api)
+before running the examples below.
 
 ## Installation
 
 ```bash
-pip install jep-cli
+pip install jep-cli==0.7.2
 ```
 
 ## Configuration
@@ -52,8 +53,9 @@ jep create \
   --what '{"delegatee":"did:example:agent","scope":{"actions":["read"]}}'
 ```
 
-Termination and Verification require `--ref`. Pass a typed reference as
-JSON when the target is another JEP event.
+For Termination and Verification, supply `--ref` and the verb-specific `what`
+described in the [implementer guide](https://github.com/hjs-spec/jep-core/blob/main/docs/IMPLEMENTER-GUIDE.md).
+Pass a typed reference as JSON when the target is another JEP event.
 
 ## Verify
 
@@ -75,19 +77,9 @@ jep verify old-event.json \
 Legacy selection must come from known artifact context. Do not use a failed 0.7
 validation as evidence that an event should be treated as 0.6.
 
-## JEP Core 0.7 model
-
-- Event Identity is `(who,id)`.
-- Event Hash identifies an exact signed artifact.
-- Core does not require a top-level nonce.
-- D requires `delegatee + scope`.
-- T requires target `ref + termination_scope`.
-- V requires target `ref + verification_scope + result`.
-- chain and policy semantics remain outside Core.
-
 ## Related repositories
 
-- JEP Core: https://github.com/hjs-spec/jep-core
+- Core contract and implementation path: https://github.com/hjs-spec/jep-core#current-contract
 - JEP API: https://github.com/hjs-spec/jep-api
 - Python SDK: https://github.com/hjs-spec/sdk-py
 - JavaScript SDK: https://github.com/hjs-spec/sdk-js
