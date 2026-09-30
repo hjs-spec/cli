@@ -3,17 +3,6 @@
 Command-line client for creating and verifying current JEP Core 0.7 events
 through the JEP API.
 
-Default endpoints:
-
-```text
-POST /v0.7/events/create
-POST /v0.7/events/verify
-GET  /health
-```
-
-Historical pre-0.7 handling is explicit through `--legacy`; the CLI never
-retries a failed 0.7 event with a legacy decoder.
-
 ## Status
 
 Experimental HTTP client. Event creation and verification run on the configured
@@ -41,8 +30,11 @@ Judgment:
 jep create \
   --verb J \
   --who did:example:agent-789 \
-  --what '{"claim":"approve","subject":"demo"}'
+  --what '{"claim":"approve","subject":"demo"}' > response.json
+jep extract-event response.json > event.json
 ```
+
+`event.json` contains the signed event used by the verification command below.
 
 Delegation:
 
@@ -63,8 +55,8 @@ Pass a typed reference as JSON when the target is another JEP event.
 jep verify event.json --mode archival
 ```
 
-0.7 validation returns `status` plus independent `checks`, not a cumulative
-Validation Level.
+Validation returns `status` and independent `checks`. Look for `status: "valid"`
+and `checks.cryptographic: "pass"` for the sample event.
 
 ## Explicit legacy verification
 
