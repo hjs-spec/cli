@@ -18,4 +18,6 @@ jep --help
 
 Keep each pull request focused. Test changed behavior and update CLI documentation. The command is `jep`; `jep-agent` belongs to the separate local Agent SDK. `jep-runtime` is a retired experiment, retained for historical reproduction. Follow the [repository directory](https://github.com/hjs-spec/.github/blob/main/PROJECTS.md) for maintenance ownership. Protocol requirements stay in [Core](https://github.com/hjs-spec/jep-core).
 
-Contact: signal@humanjudgment.org.
+Use the [shared contribution routes](https://github.com/hjs-spec/.github/blob/main/CONTRIBUTING.md)
+for independent implementations and interoperability reports. Report security-sensitive
+findings [privately](https://github.com/hjs-spec/.github/blob/main/SECURITY.md).
